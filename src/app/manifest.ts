@@ -26,5 +26,8 @@ export default function manifest(): MetadataRoute.Manifest {
         sizes: "512x512",
       },
     ],
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    permissions: ["notifications"],
   };
 }

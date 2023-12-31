@@ -8,16 +8,19 @@
 
 self.addEventListener("install", () => {
   self.skipWaiting();
-  console.log("[worker] installed");
+  log("[worker] installed");
 });
 
-self.addEventListener("activate", async () => {
-  console.log("[worker] activated");
-  await setupPushNotifications();
+self.addEventListener("activate", async (event) => {
+  log("[worker] activated");
+  event.waitUntil(self.clients.claim());
+  event.waitUntil(await setupPushNotifications());
 });
 
 self.addEventListener("push", (event) => {
+  log(`[worker] push received`);
   const data = event.data.json();
+  log(`[worker] push data: ${JSON.stringify(data)}`);
   const options = {
     body: data.body,
     data: {
@@ -68,7 +71,7 @@ self.addEventListener("notificationclick", function (event) {
 async function setupPushNotifications() {
   const existing = await self.registration.pushManager.getSubscription();
   if (existing) {
-    console.log("[worker] subscription exists");
+    log("[worker] subscription exists");
     return existing;
   }
 
@@ -89,7 +92,7 @@ async function setupPushNotifications() {
     body: JSON.stringify(body),
   });
 
-  console.log("[worker] subscription saved");
+  log("[worker] subscription saved");
 }
 
 async function getKey() {
@@ -112,4 +115,15 @@ function urlBase64ToUint8Array(base64String) {
   }
 
   return outputArray;
+}
+
+function log(message) {
+  console.log(message);
+
+  // for debugging - send message to all clients
+  // self.clients.matchAll().then((clients) => {
+  //   clients.forEach((client) => {
+  //     client.postMessage(message);
+  //   });
+  // });
 }

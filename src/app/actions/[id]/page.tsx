@@ -47,7 +47,8 @@ const Jobs = async () => {
         {repeatableJobs.length === 0 && <li>No repeatable jobs</li>}
         {repeatableJobs.map((job) => (
           <li key={job.id}>
-            <pre>{JSON.stringify(job, null, 2)}</pre>
+            <div>{job.key}</div>
+            <div>{job.pattern}</div>
           </li>
         ))}
       </ul>

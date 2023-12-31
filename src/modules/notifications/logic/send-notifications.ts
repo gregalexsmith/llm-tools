@@ -6,9 +6,9 @@ const apiKeys = {
   pubKey: process.env.VAPID_PUBLIC_KEY!,
   privKey: process.env.VAPID_PRIVATE_KEY!,
 };
-const mailTo = `mailto:YOUR_MAILTO_STRING`;
+const subject = process.env.VAPID_SUBJECT!;
 
-webPush.setVapidDetails(mailTo, apiKeys.pubKey, apiKeys.privKey);
+webPush.setVapidDetails(subject, apiKeys.pubKey, apiKeys.privKey);
 
 export const sendNotificationToUser = async (
   message: string,
@@ -33,8 +33,9 @@ export const sendNotificationToUser = async (
     } catch (err) {
       const error = err as webPush.WebPushError;
       const { statusCode, body } = error;
+      console.warn("Error sending notification", statusCode, body);
       if (statusCode === 410) {
-        console.log("subscription expired or revoked", statusCode, body);
+        console.warn("Subscription expired or revoked", statusCode, body);
         await db.deviceToken.delete({ where: { id: deviceToken.id } });
       }
     }

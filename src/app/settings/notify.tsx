@@ -3,6 +3,11 @@ import { useEffect, useState } from "react";
 import { checkSupport } from "./client-helpers";
 
 const registerSW = async () => {
+  const existingRegistration = await navigator.serviceWorker.getRegistration();
+  if (existingRegistration) {
+    return existingRegistration;
+  }
+
   const registration = await navigator.serviceWorker.register("sw.js");
   return registration;
 };
@@ -37,7 +42,6 @@ export const PushNotifications = () => {
   useEffect(() => {
     const main = async () => {
       checkSupport();
-      await requestPermission();
       await registerSW();
     };
     main().catch((err) => {
@@ -57,7 +61,7 @@ export const PushNotifications = () => {
         {permissionStatus}
       </div>
       <section className="flex gap-2 py-2">
-        {permissionStatus && permissionStatus !== "granted" && (
+        {permissionStatus !== "granted" && (
           <button onClick={requestPermission}>Request permission</button>
         )}
         <button onClick={() => sendNotification()}>Send Notification</button>
